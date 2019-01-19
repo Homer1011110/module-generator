@@ -6,18 +6,20 @@ const fsPromises = fs.promises
 
 module.exports = async (name, options) => {
     try {
-        const readRes = await fsPromises.readFile('./package.json', { encoding: 'utf8' })
-        let isModuleExist = false
+        const destDir = path.resolve(__dirname, `../modules`)
+        const tplDir = path.resolve(__dirname, `../tpls`)
         try {
-            await fsPromises.access(`modules/${name}`)
-            isModuleExist = true
+            await fsPromises.access(path.resolve(destDir, name))
             console.log(chalk.red(`模块[${name}]已存在`))
             process.exit(1)
         } catch (e) {}
-        console.log(chalk.green(`可创建此模块`))
-        fsPromises.mkdir(path.resolve(__dirname, `../modules/${name}`))
-
-        const writeRes = await fsPromises.writeFile(`modules/${name}/index.json`, readRes, { flag: 'w' })
+        const fileName = 'index.js'
+        const tplFilePath = path.resolve(tplDir, fileName)
+        const tpl = await fsPromises.readFile(tplFilePath, { encoding: 'utf8' })
+        const fileData = render(tpl, {name: name})
+        const destModulePath = path.resolve(destDir, name)
+        await fsPromises.mkdir(destModulePath)
+        await fsPromises.writeFile(path.resolve(destModulePath, fileName), fileData, { flag: 'w' })
         console.log(chalk.green(`创建完成!`))
     } catch(e) {
         console.log(chalk.red('error:'), e)

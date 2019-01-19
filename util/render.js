@@ -1,2 +1,2 @@
 module.exports = (template, context) =>
-    template.replace(/\{\{(.*?)\}\}/g, (match, key) => context[key])
+    template.replace(/\[tpl\](.*?)\[\/tpl\]/g, (match, key) => context[key])
