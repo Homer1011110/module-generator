@@ -1,5 +1,5 @@
 const chalk = require('chalk')
-const core = require('./libs/core')
+const core = require('../libs/core')
 const path = require('path')
 const fsPromise = require('fs').promises
 

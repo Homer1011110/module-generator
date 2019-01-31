@@ -12,6 +12,6 @@ program
     .alias('cm')
     .description('create a module')
     .option("-c, --conf <config>", "absolute of config file")
-    .action(require('./create-module'))
+    .action(require('./commands/create-module'))
 
 program.parse(process.argv);
