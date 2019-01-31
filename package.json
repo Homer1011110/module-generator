@@ -1,15 +1,16 @@
 {
-  "name": "demo",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "chalk": "^2.4.2",
-    "commander": "^2.19.0"
-  }
+    "name": "generate-module",
+    "version": "1.0.2",
+    "description": "",
+    "main": "index.js",
+    "bin": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "homer1011110",
+    "license": "ISC",
+    "dependencies": {
+        "chalk": "^2.4.2",
+        "commander": "^2.19.0"
+    }
 }
