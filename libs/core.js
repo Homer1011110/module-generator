@@ -30,13 +30,33 @@ async function processFile(filePath, destDir, { disableRender=false, renderData=
     }
 
     await fsPromises.writeFile(destFilePath, fileData, { flag: 'w' })
-    console.log(chalk.green(`[success] ${filePath} ==> ${destFilePath}`))
 }
 
 async function processDirectory(srcDir, destDir, renderOptions={}) {
     const fileNames = await fsPromises.readdir(srcDir)
     await Promise.all(fileNames.map(async (fileName) => {
-        await processFile(path.resolve(srcDir, fileName), destDir, renderOptions)
+        const srcFilePath = path.resolve(srcDir, fileName)
+        let srcFileStat
+        try {
+            srcFileStat = await fsPromises.stat(srcFilePath)
+        } catch (e) { throw errors.SRCFILE_NOT_FOUND }
+
+        if(srcFileStat.isFile()) {
+            await processFile(srcFilePath, destDir, renderOptions)
+        } else if(srcFileStat.isDirectory()) {
+            const subDestDir = path.resolve(destDir, fileName)
+            try {
+                await fsPromises.mkdir(subDestDir)
+            } catch(e) {}
+
+            await processDirectory(
+                srcFilePath,
+                subDestDir,
+                renderOptions
+            )
+        } else {
+            console.log(chalk.red('src file is not a file or directory'), srcFileStat)
+        }
     }))
 }
 
