@@ -1,9 +1,12 @@
+const inquirer = require('inquirer')
 const chalk = require('chalk')
 const { render } = require('../util')
 const errors = require('./errors')
 const path = require('path')
 const fs = require('fs')
 const fsPromises = fs.promises
+
+
 
 async function exist(filePath) {
     try {
@@ -19,8 +22,17 @@ async function processFile(filePath, destDir, { disableRender=false, renderData=
     const destFilePath = path.resolve(destDir, fileName)
     const isDestFileExist = await exist(destFilePath)
     if(isDestFileExist) {
-        console.log(chalk.red(`文件[${destFilePath}]已存在`))
-        throw errors.DESTFILE_EXIST
+        const questions = [
+            {
+                type: 'confirm',
+                name: 'isOverwrite',
+                message: `${chalk.yellow(destFilePath)} has exist, do you want to overwrite it ?`,
+                default: false
+            },
+        ]
+        const answers = await inquirer.prompt(questions)
+        const isOverwrite = answers.isOverwrite
+        if(!isOverwrite) return
     }
 
     let fileData = await fsPromises.readFile(filePath, { encoding: 'utf8' })
@@ -34,7 +46,8 @@ async function processFile(filePath, destDir, { disableRender=false, renderData=
 
 async function processDirectory(srcDir, destDir, renderOptions={}) {
     const fileNames = await fsPromises.readdir(srcDir)
-    await Promise.all(fileNames.map(async (fileName) => {
+    for(let i=0; i < fileNames.length; i++) {
+        const fileName = fileNames[i]
         const srcFilePath = path.resolve(srcDir, fileName)
         let srcFileStat
         try {
@@ -57,7 +70,8 @@ async function processDirectory(srcDir, destDir, renderOptions={}) {
         } else {
             console.log(chalk.red('src file is not a file or directory'), srcFileStat)
         }
-    }))
+    }
+    // await Promise.all()
 }
 
 module.exports = async ({ srcFile, destDir, renderOptions }) => {
